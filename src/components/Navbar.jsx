@@ -49,7 +49,7 @@ const Navbar = () => {
           </button>
 
           {/* Login (desktop only) */}
-          <button className="login-btn">Login</button>
+          <Link to='/login'><button className="login-btn">Login</button></Link>
 
           {/* Hamburger (mobile only) */}
           <button
@@ -57,7 +57,7 @@ const Navbar = () => {
             onClick={() => setOpen(true)}
             aria-label="Open menu"
           >
-            <Menu size={28} />
+            <Menu size={28} color="grey" />
           </button>
         </div>
       </nav>
@@ -81,7 +81,7 @@ const Navbar = () => {
           <li><Link to="/about" onClick={() => setOpen(false)}>About</Link></li>
         </ul>
 
-        <button className="login-btn mobile-login">Login</button>
+        <Link to='/login' onClick={() => setOpen(false)}><button className="login-btn mobile-login">Login</button></Link>
       </aside>
     </>
   );
