@@ -1,15 +1,16 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
-import { Sun, Moon, Menu, X } from "lucide-react";
+import { Sun, Moon, Menu, X, LogOut, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
+import { AuthContext } from "../context/AuthContext";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
 
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const { user, logout } = useContext(AuthContext);
 
-  // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -17,13 +18,8 @@ const Navbar = () => {
       }
     };
 
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    if (open) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
   return (
@@ -34,44 +30,54 @@ const Navbar = () => {
           Student<span>Dashboard</span>
         </Link>
 
-        {/* Desktop Nav Links */}
+        {/* Desktop Links */}
         <ul className="nav-links">
           <li><Link to="/">Home</Link></li>
           <li><Link to="/student">Students</Link></li>
           <li><Link to="/about">About</Link></li>
         </ul>
 
-        {/* Actions (desktop + mobile) */}
+        {/* Actions */}
         <div className="nav-actions">
           {/* Theme Toggle */}
-          <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle theme">
+          <button className="icon-btn" onClick={toggleTheme}>
             {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
           </button>
 
-          {/* Login (desktop only) */}
-          <Link to='/login'><button className="login-btn">Login</button></Link>
+          {/* AUTH SECTION */}
+          {!user ? (
+            <Link to="/login">
+              <button className="login-btn">Login</button>
+            </Link>
+          ) : (
+            <div className="profile-box">
+              {user.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt="profile"
+                  className="profile-img"
+                />
+              ): (
+                <User size={24} className="profile-icon" />
+              )}
+              <button className="logout-btn" onClick={logout}>
+                <LogOut size={20} />
+              </button>
+            </div>
+          )}
 
-          {/* Hamburger (mobile only) */}
-          <button
-            className="menu-icon"
-            onClick={() => setOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu size={28} color="grey" />
+          {/* Mobile Menu */}
+          <button className="menu-icon" onClick={() => setOpen(true)}>
+            <Menu size={28} />
           </button>
         </div>
       </nav>
 
-      {/* Blur Overlay */}
       {open && <div className="overlay" />}
 
-      {/* Mobile Slide Menu */}
+      {/* Mobile Menu */}
       <aside className={`mobile-menu ${open ? "open" : ""}`} ref={menuRef}>
-        <button
-          className="close-btn"
-          onClick={() => setOpen(false)}
-          aria-label="Close menu"
-        >
+        <button className="close-btn" onClick={() => setOpen(false)}>
           <X size={26} />
         </button>
 
@@ -81,7 +87,15 @@ const Navbar = () => {
           <li><Link to="/about" onClick={() => setOpen(false)}>About</Link></li>
         </ul>
 
-        <Link to='/login' onClick={() => setOpen(false)}><button className="login-btn mobile-login">Login</button></Link>
+        {!user ? (
+          <Link to="/login" onClick={() => setOpen(false)}>
+            <button className="login-btn mobile-login">Login</button>
+          </Link>
+        ) : (
+          <button className="login-btn mobile-login" onClick={logout}>
+            <div className="logout-mobile"><LogOut size={16} /> Logout</div>
+          </button>
+        )}
       </aside>
     </>
   );
